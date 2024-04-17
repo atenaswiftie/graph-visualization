@@ -1,9 +1,20 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render } from '@testing-library/react';
 import App from './App';
 
-test('renders learn react link', () => {
-  render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+describe('App Component', () => {
+  it('renders without crashing', () => {
+    const { getByText } = render(<App />);
+    expect(getByText('Load Graph Elements')).toBeInTheDocument();
+  });
+});
+
+
+describe('App Interaction', () => {
+  it('handles button click correctly', () => {
+    const { getByText } = render(<App />);
+    const button = getByText('Load Graph Elements');
+    fireEvent.click(button);
+    expect(button).toBeDisabled();  // Check if the button gets disabled
+  });
 });
