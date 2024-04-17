@@ -1,3 +1,16 @@
+# Project Overview
+This project aims to visualize large graph datasets using a React frontend with @react-sigma/core for rendering, and graphology for graph data management. It enhances performance by employing a web worker to handle intensive graph data processing, ensuring the user interface remains responsive.
+
+#  Technology Stack
+React: Provides the user interface framework, leveraging its efficient rendering capabilities for dynamic content.
+
+@react-sigma/core: Utilized for embedding a responsive and interactive graph within the React application. This library is well-suited for handling complex graph-based visualizations.
+
+Graphology: Manages the underlying graph structure, offering utilities for graph manipulation and analysis, which are critical for dynamically updating graph data.
+
+Web Workers: Used to offload heavy computations from the main thread, thereby maintaining smooth UI performance even with complex and large-scale graph manipulations.
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
