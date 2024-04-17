@@ -1,18 +1,24 @@
-import React from 'react';
-import GraphCanvas from './GraphCanvas';
-import { useGraphData } from './hooks/useGraphData'; // Update the path accordingly
+// src/App.tsx
+import React, { useState } from 'react';
+import Graph from './components/GraphCanvas';
+import { generateGraphData } from './utils/generateGraph';
+import { Edge,Node } from './types/GraphTypes';
+
 
 const App: React.FC = () => {
-    const { graphData, zoomLevel, generateData, zoomIn, zoomOut } = useGraphData();
+  const [graphData, setGraphData] = useState<{ nodes: Node[], edges: Edge[] }>({ nodes: [], edges: [] });
 
-    return (
-        <div>
-            <button onClick={generateData}>Generate Graph Data</button>
-            <button onClick={zoomIn}>Zoom In</button>
-            <button onClick={zoomOut}>Zoom Out</button>
-            {graphData && <GraphCanvas graphData={graphData} zoomLevel={zoomLevel} />}
-        </div>
-    );
-};
+  const handleLoadGraph = () => {
+    const data = generateGraphData();
+    setGraphData(data);
+  };
+
+  return (
+    <div className="App">
+      <button onClick={handleLoadGraph}>Load Graph</button>
+      <Graph nodes={graphData.nodes} edges={graphData.edges} />
+    </div>
+  );
+}
 
 export default App;

@@ -1,15 +1,15 @@
 export interface Node {
-    id: number;
+    id: string;
+    label: string;
     x: number;
     y: number;
-}
-
-export interface Edge {
-    from: number;
-    to: number;
-}
-
-export interface GraphData {
-    nodes: Node[];
-    edges: Edge[];
-}
+    size: number;
+    color: string;
+  }
+  
+  export interface Edge {
+    id: string;
+    source: string;
+    target: string;
+    color?: string;
+  }
