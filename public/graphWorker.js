@@ -19,15 +19,14 @@ self.onmessage = function (e) {
             });
         }
 
-        // Generate edges only if needed
-        let attempts = 0;
-        while (edges.length < edgeCount && totalEdges + edges.length < TOTAL_EDGES && attempts < 10000) {
+
+        while (edges.length < edgeCount && totalEdges + edges.length < TOTAL_EDGES) {
             const sourceIndex = Math.floor(Math.random() * nodes.length);
             let targetIndex = Math.floor(Math.random() * nodes.length);
 
-            while (targetIndex === sourceIndex) {
+          
                 targetIndex = Math.floor(Math.random() * nodes.length);
-            }
+          
 
             const sourceId = nodes[sourceIndex].id;
             const targetId = nodes[targetIndex].id;
@@ -43,7 +42,7 @@ self.onmessage = function (e) {
                     showLabel: false
                 });
             }
-            attempts++;
+      
         }
 
         self.postMessage({ nodes, edges });
