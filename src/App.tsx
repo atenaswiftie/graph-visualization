@@ -4,64 +4,67 @@ import Graph from 'graphology';
 import { circular } from 'graphology-layout';
 import "@react-sigma/core/lib/react-sigma.min.css";
 import { IEdge, INode } from './types/GraphTypes';
+import { Cosmograph } from '@cosmograph/react'
 
 
-const TOTAL_NODES = 50000;
-const NODE_BATCH_SIZE = 10000;
-const TOTAL_EDGES = 1000000;
-const EDGE_BATCH_SIZE = 100000;
+const TOTAL_NODES = 1_000_000;
+const NODE_BATCH_SIZE = 100;
+const TOTAL_EDGES = 200;
+const EDGE_BATCH_SIZE = 200;
 const INTERVAL_DURATION = 1000; // 1 second between batches
 
 const App: React.FC = () => {
     const [graph, setGraph] = useState<Graph>(new Graph());
     const graphRef = useRef<Graph>(graph);
-    const [loading, setLoading] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(true);
     const workerRef = useRef<Worker | null>(null);
     const intervalId = useRef<number | null>(null);
     const sigmaRef = useRef<any>(null);  
+    const [nodes, setNodes] = useState([ { id: '1', color: '#88C6FF' }]);
+    // const [loading, setLoading] = useState(true); // Faster than p]);
 
     useEffect(() => {
         graphRef.current = graph;  
     }, [graph]);
 
-    useEffect(() => {
-        workerRef.current = new Worker("graphWorker.js");
-        workerRef.current.onmessage = (event: MessageEvent) => {
-            const { nodes, edges } = event.data as { nodes: INode[], edges: IEdge[] };
-            const newGraph = graphRef.current.copy(); 
-            nodes.forEach(node => {
-                if (!newGraph.hasNode(node.id)) {
-                    newGraph.addNode(node.id, node);
-                }
-            });
+    // useEffect(() => {
+    //     workerRef.current = new Worker("graphWorker.js");
+    //     workerRef.current.onmessage = (event: MessageEvent) => {
+    //         const { nodes, edges } = event.data as { nodes: INode[], edges: IEdge[] };
+    //         const newGraph = graphRef.current.copy(); 
+    //         nodes.forEach(node => {
+    //             if (!newGraph.hasNode(node.id)) {
+    //                 newGraph.addNode(node.id, node);
+    //             }
+    //         });
     
-            edges.forEach(edge => {
-                if (!newGraph.hasEdge(edge.source, edge.target)) {
-                    newGraph.addEdge(edge.source, edge.target);
-                }
-            });
+    //         edges.forEach(edge => {
+    //             if (!newGraph.hasEdge(edge.source, edge.target)) {
+    //                 newGraph.addEdge(edge.source, edge.target);
+    //             }
+    //         });
     
-            circular(newGraph); // Apply circular layout
-            setGraph(newGraph);
+    //         circular(newGraph); // Apply circular layout
+    //         setGraph(newGraph);
     
-            if (newGraph.order >= TOTAL_NODES && newGraph.size >= TOTAL_EDGES) {
-                if (intervalId.current !== null) {
-                    clearInterval(intervalId.current);
-                    intervalId.current = null;
-                    setLoading(false);
-                }
-            }
-        };
+    //         if (newGraph.order >= TOTAL_NODES && newGraph.size >= TOTAL_EDGES) {
+    //             if (intervalId.current !== null) {
+    //                 clearInterval(intervalId.current);
+    //                 intervalId.current = null;
+    //                 setLoading(false);
+    //             }
+    //         }
+    //     };
     
-        return () => {
-            if (workerRef.current) {
-                workerRef.current.terminate();
-            }
-            if (intervalId.current !== null) {
-                clearInterval(intervalId.current);
-            }
-        };
-    }, []);
+    //     return () => {
+    //         if (workerRef.current) {
+    //             workerRef.current.terminate();
+    //         }
+    //         if (intervalId.current !== null) {
+    //             clearInterval(intervalId.current);
+    //         }
+    //     };
+    // }, []);
 
     const handleLoadGraph = () => {
         if (!loading) {
@@ -85,27 +88,66 @@ const App: React.FC = () => {
                         setLoading(false);
                     }
                 }
-            }, INTERVAL_DURATION);
+            }, 10);
         }
     };
 
-    return (
-        <div style={{ width: '100%', height: '100vh' }}>
-            <b>nodes:{graphRef.current.order}</b>
-            <br/>
-            <b>edges:{graphRef.current.size}</b>
-            <br/>
-            <button onClick={handleLoadGraph} disabled={loading}>
-                {loading ? 'Loading...' : 'Load Graph Elements'}
-            </button>
-            <SigmaContainer ref={sigmaRef} graph={graph} settings={{allowInvalidContainer: true}}>
-                <ControlsContainer position="top-right">
-                    <ZoomControl />
-                    <FullScreenControl />
-                </ControlsContainer>
-            </SigmaContainer>
-        </div>
-    );
+    useEffect(() => {
+   
+    
+
+    }, [])
+    
+
+      
+      const links = [
+        { source: '1', target: '2' },
+        { source: '1', target: '3' },
+        { source: '2', target: '3' },
+      ]
+
+
+
+
+useEffect(() => {
+    const generateColor = () => {
+        // Generate a random hex color or RGBA array
+        if (Math.random() > 0.5) {
+          // Hex color
+          const hex = '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
+          return hex;
+        } else {
+          // RGBA array
+          const r = Math.floor(Math.random() * 256);
+          const g = Math.floor(Math.random() * 256);
+          const b = Math.floor(Math.random() * 256);
+          const a = Math.random().toFixed(2);
+          return [r, g, b, a];
+        }
+      };
+      
+      const newnodes = [];
+      for (let i = 1; i <= 500000; i++) {
+        newnodes.push({ id: i.toString(), color: generateColor() });
+      }
+      setNodes(newnodes)
+      setLoading(false)
+}, [])
+
+
+ return (
+  <>
+  {loading ? null: <Cosmograph
+    nodes={nodes}
+    links={links}
+    nodeColor={d => d.color}
+    simulationFriction={0.1} 
+    simulationLinkSpring={0.5} 
+    simulationLinkDistance={2.0}
+  />}
+  </>
+ 
+)
 };
 
 export default App;
