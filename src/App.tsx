@@ -19,75 +19,15 @@ const App: React.FC = () => {
     const workerRef = useRef<Worker | null>(null);
     const intervalId = useRef<number | null>(null);
     const sigmaRef = useRef<any>(null);  
+useEffect(() => {
+  var graph = require('ngraph.graph')();
+graph.addLink(1, 2);
 
-    useEffect(() => {
-        graphRef.current = graph;  
-    }, [graph]);
+var renderGraph = require('ngraph.pixel');
+var renderer = renderGraph(graph);
 
-    useEffect(() => {
-        workerRef.current = new Worker("graphWorker.js");
-        workerRef.current.onmessage = (event: MessageEvent) => {
-            const { nodes, edges } = event.data as { nodes: INode[], edges: IEdge[] };
-            const newGraph = graphRef.current.copy(); 
-            nodes.forEach(node => {
-                if (!newGraph.hasNode(node.id)) {
-                    newGraph.addNode(node.id, node);
-                }
-            });
-    
-            edges.forEach(edge => {
-                if (!newGraph.hasEdge(edge.source, edge.target)) {
-                    newGraph.addEdge(edge.source, edge.target);
-                }
-            });
-    
-            circular(newGraph); // Apply circular layout
-            setGraph(newGraph);
-    
-            if (newGraph.order >= TOTAL_NODES && newGraph.size >= TOTAL_EDGES) {
-                if (intervalId.current !== null) {
-                    clearInterval(intervalId.current);
-                    intervalId.current = null;
-                    setLoading(false);
-                }
-            }
-        };
-    
-        return () => {
-            if (workerRef.current) {
-                workerRef.current.terminate();
-            }
-            if (intervalId.current !== null) {
-                clearInterval(intervalId.current);
-            }
-        };
-    }, []);
-
-    const handleLoadGraph = () => {
-        if (!loading) {
-            setLoading(true);
-            intervalId.current = window.setInterval(() => {
-                const currentGraph = graphRef.current;
-                if (currentGraph.order < TOTAL_NODES || currentGraph.size < TOTAL_EDGES) {
-                    workerRef.current?.postMessage({
-                        type: 'GENERATE_GRAPH_ELEMENTS',
-                        nodeCount: Math.min(NODE_BATCH_SIZE, TOTAL_NODES - currentGraph.order),
-                        edgeCount: Math.min(EDGE_BATCH_SIZE, TOTAL_EDGES - currentGraph.size),
-                        totalNodes: currentGraph.order,
-                        totalEdges: currentGraph.size,
-                        TOTAL_EDGES,
-                        TOTAL_NODES
-                    });
-                } else {
-                    if (intervalId.current !== null) {
-                        clearInterval(intervalId.current);
-                        intervalId.current = null;
-                        setLoading(false);
-                    }
-                }
-            }, INTERVAL_DURATION);
-        }
-    };
+ 
+}, [])
 
     return (
         <div style={{ width: '100%', height: '100vh' }}>
